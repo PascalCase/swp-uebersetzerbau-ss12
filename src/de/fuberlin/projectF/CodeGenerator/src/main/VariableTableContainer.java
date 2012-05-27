@@ -11,7 +11,7 @@ import main.model.Token;
 import main.model.Variable;
 
 public class VariableTableContainer {
-	static int numRegister = 4;
+	static int numRegister = 6;
 	Map<String,VarAdministration> variableTableList;
 	String actTable = "";
 	
@@ -39,7 +39,9 @@ public class VariableTableContainer {
 	}
 	
 	public void addVariable(Variable variable) {
-		getVariableTable(this.actTable).addVariable(variable);
+		if (!hasVariable(variable.name())) {
+			getVariableTable(this.actTable).addVariable(variable);
+		}
 	}
 	
 	public List<Variable> getAllVariables() {
@@ -65,73 +67,44 @@ public class VariableTableContainer {
 	}
 	
 	public Address getBestAddress(Variable var) {
-		//TODO
-		return null;
+		Address addr = getRegister(var);
+		if(addr != null)
+			return addr;
+		addr = getHomeAddress(var);
+		return addr;
 	}
 	
-	public RegisterInformation getReg(Variable var) {
-		return getVariableTable(this.actTable).getReg(var);
+	/*public Address getReg(Variable var) {
+		return getVariableTable(this.actTable).get(var);
+	}*/
+	
+	public Address getRegister(Variable var) {
+		List<Address> addrList = getAddresses(var);
+		Address addr = null;
+		for (Address a : addrList) {
+			if (a instanceof RegisterAddress) {
+				addr = a;
+				break;
+			}
+		}
+		return addr;
 	}
 	
 	public Variable getVarByName(String name) {
 		return getVariableTable(this.actTable).getVariableByName(name);
 	}
-	
-	public String updateVarAdministration(Token tok) {
-		switch(tok.getType()) {
-			case Definition:
-				addVariableTable(tok.getTarget());
-				System.out.println("\tAction: add variabletable " + tok.getTarget());
-				changeVariableTable(tok.getTarget());
-				System.out.println("\tAction: change to variabletable " + actTable);
-				return null;
-							
-			case DefinitionEnd:
-				changeVariableTable("global");
-				System.out.println("\tAction: change to variabletable " + actTable);
-				return null;
-				
-			case String:
-				addVariable(new Variable(tok.getTarget(),tok.getTypeTarget(),tok.getOp1()));
-				
-				System.out.println("\tAction: add variable " 	+ tok.getTarget() + "\n\t\t"
-															+ tok.getTypeTarget() + "\n\t\t"
-															+ tok.getOp1());
-				System.out.println("\t\tto variabletable: " + actTable);
-				return null;
-			
-			case Assignment:
-			case Allocation:
-				// If the Target of an Assignment is not yet in the
-				// Table we add a new variable
-				if (!hasVariable(tok.getTarget())) {
-					System.out.println("\tCould not find : " + tok.getTarget());
-					addVariable(new Variable(tok.getTarget(),tok.getTypeTarget(),null));
-					System.out.println("\tAction: add variable " 	+ tok.getTarget() + "\n\t\t"
-							+ tok.getTypeTarget());
-					System.out.println("\t\tto variabletable: " + actTable);
-				}
-				return null;
-			case Load:
-				System.out.println("load!");
-				String code = null;
-				Variable var = getVariable(tok.getOp1());
-				Variable target = new Variable(tok.getTarget(), tok.getTypeOp1(), null);
-				RegisterInformation info = getVariableTable(this.actTable).getReg(var);
-				RegisterAddress reg = info.registerAddress; 
-				if (!info.free) {
-					code = "\tmovl " + reg.getName() + " , " + getVariableTable(this.actTable).getHomeAddress(var).getName() + "(%ebp) \t\t#Temp-Variable added";
-				}
-				getVariableTable(this.actTable).loadVarInReg(var, reg);
-				getVariableTable(this.actTable).addVariable(target, reg);
-				return code;
-		}
-		return null;
-	}
 
 	private boolean hasVariable(String varName) {
 		
 		return getVariableTable(this.actTable).hasVariableWithName(varName);
+	}
+
+	public Address getFreeRegister() {
+		return getVariableTable(this.actTable).getFreeRegister();
+	}
+	
+	public List<Variable> getVarInRegister(int regNumber) {
+		return getVariableTable(this.actTable).getVarInRegister(regNumber);
 	}
 	
 }

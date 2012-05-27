@@ -4,6 +4,7 @@ package main.model;
 public class RegisterAddress extends Address {
 	
 	public int regNumber;
+	public boolean free = true;
 	
 	public RegisterAddress(int register) {
 		this.regNumber = register;

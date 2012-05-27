@@ -8,10 +8,6 @@ public class StackAddress extends Address {
 		this.addr = addr;
 	}
 	
-	public int getAddress() {
-		return addr;
-	}
-	
 	public String getName() {
 		return String.valueOf(addr);
 	}

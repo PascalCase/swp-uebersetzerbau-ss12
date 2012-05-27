@@ -59,7 +59,7 @@ public class GUI {
 		
 		DefaultTableModel tableModle = new DefaultTableModel(tableRow,tableColl);
 		JTable table = new JTable(tableModle);
-		table.setPreferredScrollableViewportSize(new Dimension(450, 300));
+		table.setPreferredScrollableViewportSize(new Dimension(500, 300));
 		table.setFillsViewportHeight(true);
 		
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -67,24 +67,27 @@ public class GUI {
 		return tablePanel;
 	}
 
-	public void updateTokenStream(Token tok) {
-		
-		Vector<String> data = new Vector<String>();
-		data.addElement(new String("" + tableRow.size()));
-		data.addElement(tok.getType().toString());
-		data.addElement(tok.getTarget());
-		data.addElement(tok.getTypeTarget());
-		data.addElement(tok.getOp1());
-		data.addElement(tok.getTypeOp1());
-		data.addElement(tok.getOp2());
-		data.addElement(tok.getTypeOp2());
-		data.addElement(new String("" + tok.getParameterCount()));
-		
-		tableRow.addElement(data);
+	public void updateTokenStreamTable(Vector<Token> code) {
+		for(Token t: code) {
+			Vector<String> data = new Vector<String>();
+			data.addElement(new String("" + tableRow.size()));
+			data.addElement(t.getType().toString());
+			data.addElement(t.getTarget());
+			data.addElement(t.getTypeTarget());
+			data.addElement(t.getOp1());
+			data.addElement(t.getTypeOp1());
+			data.addElement(t.getOp2());
+			data.addElement(t.getTypeOp2());
+			data.addElement(new String("" + t.getParameterCount()));
+			tableRow.addElement(data);
+		}
 	}
 	
 	public void updateCodeArea(String code) {
 		codeArea.setText(code);
+	}
+	public void appendCodeArea(String text) {
+		codeArea.append(text);
 	}
 }
 

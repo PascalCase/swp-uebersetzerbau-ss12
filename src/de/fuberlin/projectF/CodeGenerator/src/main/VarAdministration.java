@@ -164,24 +164,27 @@ public class VarAdministration {
 		return variableNames.get(varName);
 	}
 
-	public RegisterInformation getReg(Variable var) {
-		//We look for var in Register
-		for (int i = 0; i < regDescriptor.length; i++) {
-			List<Variable> varList = regDescriptor[i];
-			if (varList.contains(var)) {
-				return new RegisterInformation(new RegisterAddress(i));
-			}
-		}
+	public Address getFreeRegister() {
+		/*//We look for var in Register
+		
+		}*/
 		//We look for something empty
 		for (int i = 0; i < regDescriptor.length; i++) {
 			List<Variable> varList = regDescriptor[i];
 			if (varList.isEmpty()) {
-				return new RegisterInformation(new RegisterAddress(i));
+				//return new RegisterInformation(new RegisterAddress(i));
+				return new RegisterAddress(i);
 			}
 		}
 		//We have to free something
 		//TODO : schlauer machen
-		return new RegisterInformation(new RegisterAddress(0), regDescriptor[0].get(0));
+		//return new RegisterInformation(new RegisterAddress(0), regDescriptor[0].get(0));
+		return null;
+	}
+
+	public List<Variable> getVarInRegister(int regNumber) {
+			List<Variable> varList = regDescriptor[regNumber];
+			return varList;
 	}
 
 }

@@ -1,6 +1,8 @@
 package main;
 
 import java.util.LinkedList;
+import java.util.Vector;
+
 import main.model.Token;
 import main.model.TokenType;
 
@@ -8,36 +10,59 @@ public class CodeGenerator {
 
 	public static String generateCode(String filename, boolean debug, boolean gui) {
 		// Lexer, Variablenverwaltung und Übersetzter erstellen
+		Vector<Token> code = new Vector<Token>();
 		Lexer lex = new Lexer(filename);
-		VariableTableContainer varCon = new VariableTableContainer();
-		Translator trans = new Translator(varCon);
+		Translator trans = new Translator();
 		
 		// Token durchgehen und übersetzten bis EOF
-		Token tok;
+
 		GUI Gui = new GUI();
 		int linecount = 0;
+		Token tok;
+		// Token einlesen
 		while ((tok = lex.getNextToken()).getType() != TokenType.EOF) {
-			if (debug) {
-				System.out.println("Input file: " + filename);
-				System.out.println("File " + filename + " Token #"
-						+ linecount++);
-				tok.print();
-			}
-			if(gui)
-				Gui.updateTokenStream(tok);
-			
-			String code = varCon.updateVarAdministration(tok);
-			if (code != null) {
-				trans.addCode(code);				
-			}
-			trans.translate(tok);
+			code.addElement(tok);
 		}
 		lex.close();
+		
+		// Token informationen ausgeben
+		if (debug) {
+			for(Token t: code) {
+				System.out.println("Input file: " + filename);
+				System.out.println("File " + filename + " Token #" + linecount++);
+				t.print();
+			}
+		}
+		
+		// Token Tabelle in der gui füllen
+		if(gui)
+			Gui.updateTokenStreamTable(code);
+		
+		// Token übersetzen
+		try {
+			trans.translate(code);
+		} catch(Exception e) {
+			e.printStackTrace();
+			if(gui) {
+				Gui.updateCodeArea(trans.getCode());
+				Gui.appendCodeArea("\nError:\n");
+				for(StackTraceElement errStack : e.getStackTrace())
+					Gui.appendCodeArea("at " + errStack.getMethodName()
+										+ "(" + errStack.getFileName()
+										+ ":" + errStack.getLineNumber()
+										+ ")");
+			}
+		}
+		// Ausgabe des erzeugten Code's
 		if (debug) {
 			trans.print();
 		}
+		
+		// Ausgabe des erzeugten Code's in die GUI
 		if(gui)
 			Gui.updateCodeArea(trans.getCode());
+		
+		// Rückgabe des erzeugten Code's
 		return trans.getCode();
 	}
 
