@@ -148,8 +148,10 @@ public class Translator {
 								System.out.println("\t-> will be used in token " + result);
 							}
 						}
-						if(result == 0)
+						if(result == 0) {
 							targetAddress = new RegisterAddress(i);
+							break;
+						}
 						
 					}
 					
